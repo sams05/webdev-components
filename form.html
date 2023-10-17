@@ -1,0 +1,42 @@
+<form id="signup-form" action="" method="get">
+    <!-- Using get method to check submission value. Should use post method in real signup form -->
+    <h3>Let's do this!</h3>
+    <div class="form-field-container">
+        <div class="form-row">
+            <div class="form-field">
+                <label for="fname">first name</label>
+                <input id="fname" name="fname" type="text" placeholder=" " required>
+            </div>
+            <div class="form-field">
+                <label for="lname">last name</label>
+                <input id="lname" name="lname" type="text" placeholder=" " required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="email">email</label>
+                <input id="email" name="email" type="email" placeholder=" " required>
+            </div>
+            <div class="form-field">
+                <label for="phone">phone number</label>
+                <input id="phone" name="phone" type="tel" maxlength="15" placeholder=" " required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="pass">password</label>
+                <input id="pass" class="error" name="pass" type="password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" placeholder=" " required>
+                <span></span>
+            </div>
+            <div class="form-field">
+                <label for="pass-confirm">confirm password</label>
+                <input id="pass-confirm" class="error" name="pass-confirm" type="password" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" placeholder=" " required>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="signup">
+    <button type="submit" form="signup-form">Create Account</button>
+</div>

@@ -1,0 +1,69 @@
+/* | Defining custom fonts with font-face */
+/* Regular font */
+@font-face {
+    font-family: 'Cedarville Cursive';
+    font-style: normal;
+    font-weight: 400;
+    src: url("./CedarvilleCursive-Regular.ttf");
+}
+/* Variable font */
+@font-face {
+    font-family: Orbitron;
+    src: url(fonts/Orbitron-VariableFont_wght.ttf);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+/* | Reset */
+/* Reset margin, padding, box model */
+* {
+    margin: 0;
+    padding: 0;
+    /* See https://css-tricks.com/box-sizing/ for how to cover pseudo elements */
+    box-sizing: border-box;
+}
+
+:root {
+    /* Site color palette */
+    --blue: rgb(25 146 211);
+    --gray: rgb(226 232 240);
+    --orange: rgb(241 177 39);
+}
+
+/* Reset default link style */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Reset default list bullet points */
+ul {
+    list-style: none;
+}
+
+/* Button reset adapted from https://moderncss.dev/css-button-styling-guide/ */
+button {
+    border: none;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+/* | Button */
+button {
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: white;
+    background-color: var(--blue);
+}
+
+button:active {
+    box-shadow: inset 0 0 5px 2px rgb(0, 0, 0);
+}
+
+/* Delete button */
+button.del-btn {
+    background-color: var(--red);
+}

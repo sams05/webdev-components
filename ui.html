@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            /* | Reset */
+            /* Reset margin, padding, box model */
+            * {
+                margin: 0;
+                padding: 0;
+                /* See https://css-tricks.com/box-sizing/ for how to cover pseudo elements */
+                box-sizing: border-box;
+            }
+
+            :root {
+                /* Site color palette */
+                --blue: rgb(25 146 211);
+                --gray: rgb(226 232 240);
+                --orange: rgb(241 177 39);
+            }
+
+            /* Reset default link style */
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
+
+            /* Reset default list bullet points */
+            ul {
+                list-style: none;
+            }
+
+            /* Button reset adapted from https://moderncss.dev/css-button-styling-guide/ */
+            button {
+                border: none;
+                background-color: transparent;
+                font-family: inherit;
+                font-size: inherit;
+                cursor: pointer;
+            }
+
+            /* | Button */
+            button {
+                border: 2px solid black;
+                border-radius: 5px;
+                padding: 5px 10px;
+                color: white;
+                background-color: var(--blue);
+            }
+
+            button:active {
+                box-shadow: inset 0 0 5px 2px rgb(0, 0, 0);
+            }
+
+            /* Delete button */
+            button.del-btn {
+                background-color: var(--red);
+            }
+        </style>
+        <script>
+            // Helper functions
+            const domHelper = (function () {
+                /**
+                 * Attach the provided event handler to all nodes in the given NodeList.
+                 * @param {NodeList} list NodeList of nodes to add event handler to
+                 * @param {string} event Event
+                 * @param {Function} func Event handler
+                 */
+                function addEventListenerList(list, event, func) {
+                    for (let node of list) {
+                        node.addEventListener(event, func);
+                    }
+                }
+                function removeEventListenerList(list, event, func) {
+                    for (let node of list) {
+                        node.removeEventListener(event, func);
+                    }
+                }
+                return {
+                    addEventListenerList,
+                    removeEventListenerList,
+                };
+            })();
+        </script>
+    </head>
+    <body>
+        <!-- || Dropdown Button -->
+        <style>
+            .dropdown-menu .dropdown-container,
+            .dropdown-menu .dropdown-items {
+                display: flex;
+                flex-direction: column;
+            }
+            .dropdown-menu .dropdown-parent,
+            .dropdown-menu .dropdown-child {
+                --btn-width: 200px;
+                width: var(--btn-width);
+            }
+            .dropdown-menu .dropdown-items-container {
+                visibility: hidden;
+                position: absolute;
+            }
+            .dropdown-menu .dropdown-items-container.visible {
+                visibility: visible;
+                position: static;
+            }
+        </style>
+        <nav class="dropdown-menu">
+            <ul class="dropdown-container">
+                <li>
+                    <button class="dropdown-parent" data-dropdown-target="my-items">Dropdown</button>
+                </li>
+                <li class="dropdown-items-container" id="my-items">
+                    <ul class="dropdown-items">
+                        <li><button class="dropdown-child">Item 1</button></li>
+                        <li><button class="dropdown-child">Item 2</button></li>
+                        <li><button class="dropdown-child">Item 3</button></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <nav class="dropdown-menu">
+            <ul class="dropdown-container">
+                <li>
+                    <button class="dropdown-parent" data-dropdown-target="my-items2">Dropdown</button>
+                </li>
+                <li class="dropdown-items-container" id="my-items2">
+                    <ul class="dropdown-items">
+                        <li><button class="dropdown-child">Item 1</button></li>
+                        <li><button class="dropdown-child">Item 2</button></li>
+                        <li><button class="dropdown-child">Item 3</button></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <script>
+            (() => {
+                function expandDropdown(dropdownParent) {
+                    const targetId = dropdownParent.dataset.dropdownTarget;
+                    const target = document.getElementById(targetId);
+                    target.classList.toggle('visible');
+                }
+
+                const dropdownParents = document.querySelectorAll('.dropdown-parent');
+                domHelper.addEventListenerList(dropdownParents, 'click', (e) => {
+                    const dropdownParent = e.target;
+                    expandDropdown(dropdownParent);
+                });
+            })();
+        </script>
+    </body>
+</html>
