@@ -11,12 +11,14 @@ import * as domHelper from `dom-helper.js`;
 Adapted from https://www.youtube.com/watch?v=S-VeYcOCFZw
 
 Using `@starting-style` to transition on display:
-- https://developer.chrome.com/en/blog/new-in-chrome-117/#exit-entry-animations
-- https://drafts.csswg.org/css-transitions-2/#defining-before-change-style
-- https://chromestatus.com/feature/4515377717968896
-- https://www.youtube.com/watch?v=y8CYSwHXVNE&t=636s
+
+-   https://developer.chrome.com/en/blog/new-in-chrome-117/#exit-entry-animations
+-   https://drafts.csswg.org/css-transitions-2/#defining-before-change-style
+-   https://chromestatus.com/feature/4515377717968896
+-   https://www.youtube.com/watch?v=y8CYSwHXVNE&t=636s
 
 For browsers that don't support `@starting-style`, change to only using opacity to hide and transition the menu.
+
 1. Move the rules inside @starting-style to .dropdown-menu
 2. Remove all styling related to display
     - `&.active{display: block;}`
@@ -110,6 +112,9 @@ document.addEventListener('click', (e) => {
 
 Adapted from https://www.youtube.com/watch?v=9HcxHDS2w1s
 
+### Issues
+- Can make `switchSlide(slides, markers, offset)` more reusable by refactoring to use slides and markers as nodelists. This will reduce the dependency on the html code
+
 ```css
 .carousel {
     width: 60vw;
@@ -170,12 +175,40 @@ Adapted from https://www.youtube.com/watch?v=9HcxHDS2w1s
         outline: 1px solid black;
     }
 }
+/* ||| Markers */
+.carousel-markers {
+    position: absolute;
+    bottom: 1rem;
+    /* Horizontally center the markers */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+
+    display: flex;
+    gap: 1rem;
+
+    .carousel-marker-btn {
+        height: 1rem;
+        width: 1rem;
+        border: 0;
+        border-radius: 50%;
+        padding: 0;
+
+        background-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0px 0px 5px 1px black;
+        &:active {
+            box-shadow: inset 0 0 5px 2px rgb(0, 0, 0);
+        }
+
+        &.active {
+            background-color: rgba(255, 255, 255, 1);
+        }
+    }
+}
 ```
 
 ```html
 <div class="carousel">
-    <button type="button" class="carousel-btn prev" data-carousel-btn="prev">&lArr;</button>
-    <button type="button" class="carousel-btn next" data-carousel-btn="next">&rArr;</button>
     <ul class="carousel-slides">
         <li class="carousel-slide active">
             <img src="https://picsum.photos/800/400?random=1" alt="" />
@@ -187,26 +220,115 @@ Adapted from https://www.youtube.com/watch?v=9HcxHDS2w1s
             <img src="https://picsum.photos/800/400?random=3" alt="" />
         </li>
     </ul>
+    <!-- Generate with javascript
+            <ul class="carousel-markers">
+                <li class="carousel-marker">
+                    <button class="carousel-marker-btn active"></button>
+                </li>
+                <li class="carousel-marker">
+                    <button class="carousel-marker-btn"></button>
+                </li>
+                <li class="carousel-marker">
+                    <button class="carousel-marker-btn"></button>
+                </li>
+            </ul>
+            -->
+    <button type="button" class="carousel-btn prev" data-carousel-btn="prev">&lArr;</button>
+    <button type="button" class="carousel-btn next" data-carousel-btn="next">&rArr;</button>
 </div>
 ```
 
 ```js
-const btns = document.querySelectorAll('[data-carousel-btn]');
-domHelper.addEventListenerList(btns, 'click', (e) => {
-    const btn = e.currentTarget;
-    const offset = btn.dataset.carouselBtn === 'next' ? 1 : -1;
-    const slides = btn.closest('.carousel').querySelector('.carousel-slides');
-    const activeSlide = slides.querySelector('.active');
-    let newIndex = [...slides.children].indexOf(activeSlide) + offset;
-    if (newIndex < 0) {
-        // Wrap to the last slide
-        newIndex = slides.children.length - 1;
+(() => {
+    function createCarouselMarker(isActive = false) {
+        const li = document.createElement('li');
+        li.classList.add('carousel-marker');
+        const btn = document.createElement('button');
+        btn.classList.add('carousel-marker-btn');
+        if (isActive) {
+            btn.classList.add('active');
+        }
+        btn.addEventListener('click', (e) => {
+            // Get reference of target slide btn
+            const targetSlideBtn = e.currentTarget;
+
+            // Get reference of active slide btn and get array of marker btns
+            const markerBtns = [...targetSlideBtn.closest('.carousel').querySelectorAll('.carousel-marker-btn')];
+            const activeSlideBtn = markerBtns.find((btn) => btn.matches('.active'));
+
+            // Compare indices of the btns to get offset
+            const offset = markerBtns.indexOf(targetSlideBtn) - markerBtns.indexOf(activeSlideBtn);
+
+            const slides = targetSlideBtn.closest('.carousel').querySelector('.carousel-slides');
+            const markers = targetSlideBtn.closest('.carousel').querySelector('.carousel-markers');
+            switchSlide(slides, markers, offset);
+        });
+        li.append(btn);
+        return li;
     }
-    if (newIndex >= slides.children.length) {
-        // Wrap to the first slide
-        newIndex = 0;
+
+    function createCarouselMarkers(numSlides) {
+        const ul = document.createElement('ul');
+        ul.classList.add('carousel-markers');
+        for (let i = 0; i < numSlides; i++) {
+            const li = i === 0 ? createCarouselMarker(true) : createCarouselMarker();
+            ul.append(li);
+        }
+        return ul;
     }
-    slides.children[newIndex].classList.add('active');
-    activeSlide.classList.remove('active');
-});
+
+    /**
+     * Switch the slides by the offset.
+     * @param {HTMLElement} slides Container whose direct children are slides of the slider
+     * @param {HTMLElement} markers Container whose direct children are list items containing marker buttons
+     * @param {Number} offset Amount of slides to shift over
+     */
+    function switchSlide(slides, markers, offset) {
+        const activeSlide = slides.querySelector('.active');
+        let newIndex = [...slides.children].indexOf(activeSlide) + offset;
+        if (newIndex < 0) {
+            // Wrap to the last slide
+            newIndex = slides.children.length - 1;
+        }
+        if (newIndex >= slides.children.length) {
+            // Wrap to the first slide
+            newIndex = 0;
+        }
+        slides.children[newIndex].classList.add('active');
+        activeSlide.classList.remove('active');
+
+        // Reminder: ul.markers > li.marker > button.marker-btn[.active]?
+        const activeMarkerBtn = markers.querySelector('.active');
+        const newMarker = markers.children[newIndex];
+        const newMarkerBtn = newMarker.firstElementChild;
+        newMarkerBtn.classList.add('active');
+        activeMarkerBtn.classList.remove('active');
+    }
+
+    // Add carousel markers into the DOM
+    // ul.markers > li.marker > button.marker-btn[.active]?
+    const carousels = document.querySelectorAll('.carousel');
+    carousels.forEach((carousel) => {
+        const slides = carousel.querySelector('.carousel-slides');
+        const numSlides = slides.childElementCount;
+        const carouselMarkers = createCarouselMarkers(numSlides);
+        carousel.append(carouselMarkers);
+    });
+
+    const btns = document.querySelectorAll('[data-carousel-btn]');
+    domHelper.addEventListenerList(btns, 'click', (e) => {
+        const btn = e.currentTarget;
+        const offset = btn.dataset.carouselBtn === 'next' ? 1 : -1;
+        const slides = btn.closest('.carousel').querySelector('.carousel-slides');
+        const markers = btn.closest('.carousel').querySelector('.carousel-markers');
+        switchSlide(slides, markers, offset);
+    });
+
+    // Start autoplay
+    carousels.forEach((carousel) => {
+        const slides = carousel.querySelector('.carousel-slides');
+        const markers = carousel.querySelector('.carousel-markers');
+        setInterval(switchSlide, 5000, slides, markers, 1);
+    });
+})();
 ```
