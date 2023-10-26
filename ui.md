@@ -108,11 +108,173 @@ document.addEventListener('click', (e) => {
 });
 ```
 
+### Rudder
+
+```css
+/* ||| Menu */
+.rudder-menu {
+    --rudder-menu-width: 100vw;
+    --rudder-main-btn-dim: 60px;
+    --rudder-sides: calc((3 / 4) * var(--rudder-main-btn-dim));
+
+    /* Spacing calculations */
+    --rudder-menu-children: 3; /* left, main, right */
+    --rudder-menu-available-space: calc(
+        var(--rudder-menu-width) - var(--rudder-main-btn-dim) - 2 * var(--rudder-sides)
+    );
+    /* Get unit spacing as if we are spacing evenly with flexbox: 2 units on each side of an element */
+    --rudder-even-space-unit: calc(var(--rudder-menu-available-space) / (2 * var(--rudder-menu-children)));
+
+    /* Menu should stretch across the bottom of the screen */
+    width: var(--rudder-menu-width);
+    position: fixed;
+    bottom: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* ||| Rudder left and right */
+.rudder-menu {
+    .rudder-left {
+        transform: translateX(calc(-2 * var(--rudder-even-space-unit)));
+    }
+    .rudder-right {
+        transform: translateX(calc(2 * var(--rudder-even-space-unit)));
+    }
+}
+.rudder-menu .rudder-main {
+    display: flex;
+    justify-content: center;
+    background-color: var(--blue);
+    border-radius: calc((1 / 2) * var(--rudder-main-btn-dim));
+    width: var(--rudder-main-btn-dim);
+
+    transition: width 1s ease-in-out;
+
+    :where(.rudder-main-menu-left, .rudder-main-menu-right) {
+        display: none; /* Change to display: flex when active */
+    }
+
+    &.active {
+        width: 100%;
+    }
+
+    &.active :where(.rudder-main-menu-left.flex, .rudder-main-menu-right.flex) {
+        display: flex;
+    }
+}
+/* ||| Button */
+.rudder-menu button {
+    width: var(--rudder-main-btn-dim);
+    height: var(--rudder-main-btn-dim);
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+}
+.rudder-menu svg {
+    width: 100%;
+    height: auto;
+}
+.rudder-menu :where(.rudder-left, .rudder-right) button {
+    width: var(--rudder-sides);
+    height: var(--rudder-sides);
+}
+```
+
+```html
+<div class="rudder-menu">
+    <div class="rudder-left">
+        <button type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <title>account-circle</title>
+                <path
+                    d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+                />
+            </svg>
+        </button>
+    </div>
+    <div class="rudder-main" id="rudder-main">
+        <div class="rudder-main-menu-left">
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <title>account-circle</title>
+                    <path
+                        d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+                    />
+                </svg>
+            </button>
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <title>account-circle</title>
+                    <path
+                        d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+                    />
+                </svg>
+            </button>
+        </div>
+        <button type="button" id="rudder-main-menu-central-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <title>plus</title>
+                <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+            </svg>
+        </button>
+        <div class="rudder-main-menu-right">
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <title>account-circle</title>
+                    <path
+                        d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+                    />
+                </svg>
+            </button>
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <title>account-circle</title>
+                    <path
+                        d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+                    />
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="rudder-right">
+        <button type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <title>account-circle</title>
+                <path
+                    d="M12,19.2C9.5,19.2 7.29,17.92 6,16C6.03,14 10,12.9 12,12.9C14,12.9 17.97,14 18,16C16.71,17.92 14.5,19.2 12,19.2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2Z"
+                />
+            </svg>
+        </button>
+    </div>
+</div>
+```
+
+```js
+(() => {
+    function toggleRudderMain() {
+        const rudderMain = document.getElementById('rudder-main');
+        rudderMain.classList.toggle('active');
+        setTimeout(() => {
+            const left = document.querySelector('.rudder-main-menu-left');
+            const right = document.querySelector('.rudder-main-menu-right');
+            left.classList.toggle('flex');
+            right.classList.toggle('flex');
+        }, 1000);
+    }
+
+    const rudderCentralBtn = document.getElementById('rudder-main-menu-central-btn');
+    rudderCentralBtn.addEventListener('click', (e) => toggleRudderMain());
+})();
+```
+
 ### Image Slider
 
 Adapted from https://www.youtube.com/watch?v=9HcxHDS2w1s
 
 ### Issues
+
 - Can make `switchSlide(slides, markers, offset)` more reusable by refactoring to use slides and markers as nodelists. This will reduce the dependency on the html code
 
 ```css
