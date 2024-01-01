@@ -275,7 +275,7 @@ Adapted from https://www.youtube.com/watch?v=9HcxHDS2w1s
 
 ### Issues
 
-- Can make `switchSlide(slides, markers, offset)` more reusable by refactoring to use slides and markers as nodelists. This will reduce the dependency on the html code
+-   Can make `switchSlide(slides, markers, offset)` more reusable by refactoring to use slides and markers as nodelists. This will reduce the dependency on the html code
 
 ```css
 .carousel {
@@ -493,4 +493,124 @@ Adapted from https://www.youtube.com/watch?v=9HcxHDS2w1s
         setInterval(switchSlide, 5000, slides, markers, 1);
     });
 })();
+```
+
+### Modal
+
+Adapted from https://blog.webdevsimplified.com/2023-04/html-dialog/
+
+```css
+/* Button to trigger modal*/
+.modal-btn {
+    + .modal {
+        width: 600px;
+        height: 600px;
+        position: fixed;
+        inset: 50vh 50vw;
+        translate: -50% -50%;
+        /*padding: 30px 50px;*/
+
+        /* Have to wrap everything in the modal with .modal-container to apply flexbox, grid, or other display values
+            since the modal itself need to retain its default display value to work properly */
+        .modal-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            .modal-header {
+                .modal-close-btn {
+                    /* Make it an icon button*/
+                    border: none;
+                    background-color: transparent;
+                    color: black;
+                    /* Place it at the top right corner */
+                    display: flex;
+                    margin-left: auto;
+
+                    align-items: center;
+                    justify-content: center;
+                    padding: 2px;
+                    border-radius: 50%;
+                }
+            }
+
+            .modal-content {
+                /* Have content take up the remaining height */
+                /* min-height must be set to override the default content-based minimum size
+                for a flex item. This is needed to allow for the items in .modal-content to overflow.
+                Ref.: https://drafts.csswg.org/css-flexbox/#flex-common */
+                min-height: 0;
+                flex: 1;
+
+                overflow-y: scroll;
+            }
+        }
+    }
+}
+```
+
+```html
+<!-- || Modal trigger button -->
+<button type="button" class="modal-btn" data-target-modal-id="modal">Open Modal</button>
+<!-- || Modal -->
+<dialog class="modal" id="modal">
+    <div class="modal-container">
+        <section class="modal-header">
+            <button type="button" class="modal-close-btn">x</button>
+            <h3>Title</h3>
+        </section>
+        <section class="modal-content"></section>
+    </div>
+</dialog>
+```
+
+```js
+// modal.js
+
+/**
+ * Close modal if the user clicked outside the modal.
+ * Adapted from https://blog.webdevsimplified.com/2023-04/html-dialog/
+ * @param {HTMLDialogElement} modal
+ * @param {Number} clientX
+ * @param {Number} clientY
+ */
+function closeModalOutsideRange(modal, clientX, clientY) {
+    const modalDimensions = modal.getBoundingClientRect();
+    if (
+        clientX < modalDimensions.left ||
+        clientX > modalDimensions.right ||
+        clientY < modalDimensions.top ||
+        clientY > modalDimensions.bottom
+    ) {
+        modal.close();
+    }
+}
+
+/**
+ * Add event listeners to make a modal trigger element and its corresponding modal (a dialog element) functional.
+ * @param {HTMLElement} modalTriggerElem The HTML Element i.e. button to open a modal. The element should have
+ * a data-target-modal-id attribute to identify the id of the modal to open. The modal element should have a close button
+ * with class modal-close-btn
+ */
+function initModal(modalTriggerElem) {
+    const modalId = modalTriggerElem.dataset.targetModalId;
+    const modal = document.getElementById(modalId);
+    const modalCloseBtn = modal.querySelector('.modal-close-btn');
+
+    // To open modal
+    modalTriggerElem.addEventListener('click', (e) => {
+        modal.showModal();
+    });
+    // To close modal by clicking outside the modal
+    modal.addEventListener('click', (e) => {
+        const { clientX, clientY } = e;
+        closeModalOutsideRange(modal, clientX, clientY);
+    });
+    // To close modal using its close button
+    modalCloseBtn.addEventListener('click', (e) => {
+        modal.close();
+    });
+}
+
+export { initModal };
 ```
